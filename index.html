@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mathis De Castro — Données &amp; traitement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Public+Sans:wght@400;500;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1f28;
+  --dim:#5d6775;
+  --faint:#8b95a3;
+  --paper:#fdfdfc;
+  --wash:#f3f5f7;
+  --line:#e1e5ea;
+  --hair:#eef1f4;
+  --slate:#3f5872;      /* bleu ardoise du CV */
+  --slate-d:#2c4058;
+  --ochre:#b07d3f;      /* accent chaud, tenu */
+  --sage:#5a7a63;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Public Sans',system-ui,sans-serif;
+  background:var(--paper);color:var(--ink);
+  line-height:1.65;font-size:15px;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:980px;margin:0 auto;padding:0 clamp(22px,5vw,52px)}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--slate);outline-offset:3px;border-radius:2px}
+
+/* ─── nav ─── */
+nav{position:sticky;top:0;z-index:60;background:rgba(253,253,252,.94);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--hair)}
+nav .wrap{display:flex;justify-content:space-between;align-items:center;height:62px;gap:20px}
+.brand{font-family:'Fraunces',Georgia,serif;font-size:16px;font-weight:600;
+  letter-spacing:-.012em;text-decoration:none;white-space:nowrap}
+.navlinks{display:flex;gap:26px;font-size:13.5px}
+.navlinks a{color:var(--dim);text-decoration:none;position:relative;
+  padding:4px 0;transition:color .2s}
+.navlinks a::after{content:'';position:absolute;left:0;right:100%;bottom:0;
+  height:1.5px;background:var(--slate);transition:right .28s cubic-bezier(.4,0,.2,1)}
+.navlinks a:hover{color:var(--ink)}
+.navlinks a.on{color:var(--slate)}
+.navlinks a.on::after{right:0}
+
+/* ─── hero ─── */
+header{padding:84px 0 66px;border-bottom:1px solid var(--line)}
+.hero{display:grid;grid-template-columns:1.62fr 1fr;gap:clamp(30px,5vw,58px);align-items:end}
+.avail{display:inline-flex;align-items:center;gap:9px;font-size:12.5px;
+  color:var(--dim);margin-bottom:22px}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--sage);
+  box-shadow:0 0 0 0 rgba(90,122,99,.5);animation:pulse 2.6s infinite}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(90,122,99,.45)}
+  70%{box-shadow:0 0 0 7px rgba(90,122,99,0)}
+  100%{box-shadow:0 0 0 0 rgba(90,122,99,0)}
+}
+h1{font-family:'Fraunces',Georgia,serif;font-size:clamp(33px,5.4vw,53px);
+  font-weight:500;line-height:1.06;letter-spacing:-.025em;margin-bottom:20px}
+h1 em{font-style:italic;color:var(--slate)}
+.lede{font-size:16px;color:var(--dim);max-width:48ch;line-height:1.68}
+.side{border-left:1px solid var(--line);padding-left:clamp(20px,3vw,32px);padding-bottom:4px}
+.stat{margin-bottom:20px}
+.stat:last-child{margin-bottom:0}
+.stat b{font-family:'Fraunces',serif;font-size:31px;font-weight:500;
+  display:block;line-height:1;color:var(--slate);letter-spacing:-.022em}
+.stat span{font-size:11px;color:var(--faint);letter-spacing:.1em;
+  text-transform:uppercase;display:block;margin-top:6px}
+.links{display:flex;gap:9px;flex-wrap:wrap;margin-top:34px}
+.links a{font-size:13.5px;text-decoration:none;padding:9px 18px;
+  border:1px solid var(--line);color:var(--ink);transition:.2s}
+.links a:hover{border-color:var(--slate);color:var(--slate)}
+.links a.fill{background:var(--slate);border-color:var(--slate);color:#fff}
+.links a.fill:hover{background:var(--slate-d);border-color:var(--slate-d);color:#fff}
+.terms{display:grid;grid-template-columns:repeat(4,1fr);
+  gap:1px;background:var(--line);border:1px solid var(--line);margin-top:32px}
+.term{background:#fff;padding:13px 16px;min-width:0}
+.term .k{display:block;font-size:10.5px;color:var(--faint);letter-spacing:.11em;
+  text-transform:uppercase;margin-bottom:5px;font-weight:600}
+.term .v{display:block;font-size:13.5px;color:var(--ink);line-height:1.4}
+
+/* ─── sections ─── */
+section{padding:66px 0;border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:none}
+.shead{display:flex;align-items:baseline;gap:16px;margin-bottom:34px}
+.shead h2{font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--faint);font-weight:600;white-space:nowrap}
+.shead i{flex:1;height:1px;background:var(--line)}
+
+/* ─── filtres ─── */
+.filters{display:flex;gap:24px;flex-wrap:wrap;margin-bottom:30px;font-size:13.5px}
+.filt{background:none;border:none;font-family:inherit;font-size:13.5px;
+  color:var(--dim);cursor:pointer;padding:4px 0;position:relative;transition:color .2s}
+.filt::after{content:'';position:absolute;left:0;right:100%;bottom:0;height:1.5px;
+  background:var(--ochre);transition:right .28s cubic-bezier(.4,0,.2,1)}
+.filt:hover{color:var(--ink)}
+.filt.on{color:var(--ochre)}
+.filt.on::after{right:0}
+
+/* ─── carte retournable ─── */
+.flip{perspective:2200px;margin-bottom:38px;
+  transition:height .58s cubic-bezier(.32,.72,.28,1)}
+.flip.gone{display:none}
+.inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;
+  transition:transform .66s cubic-bezier(.32,.72,.28,1)}
+.flip.on .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;background:#fff;border:1px solid var(--line);
+  display:flex;flex-direction:column;transition:border-color .2s}
+.face.b{transform:rotateY(180deg)}
+.flip:hover .face{border-color:#d3d9e0}
+
+.chead{padding:24px 28px 20px;border-bottom:1px solid var(--hair);
+  display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+.chead h3{font-family:'Fraunces',serif;font-size:23px;font-weight:500;
+  line-height:1.2;letter-spacing:-.015em}
+.ctx{font-size:12px;color:var(--faint);letter-spacing:.07em;
+  text-transform:uppercase;margin-top:7px}
+.turn{flex-shrink:0;background:none;border:1px solid var(--line);
+  padding:9px 16px;font-family:inherit;font-size:12.5px;color:var(--slate);
+  cursor:pointer;display:flex;align-items:center;gap:9px;
+  white-space:nowrap;transition:.2s}
+.turn:hover{background:var(--slate);border-color:var(--slate);color:#fff}
+.turn svg{width:11px;height:11px;transition:transform .3s}
+.turn:hover svg{transform:translateX(3px)}
+.flip.on .turn svg{transform:scaleX(-1)}
+.flip.on .turn:hover svg{transform:scaleX(-1) translateX(3px)}
+
+.cbody{padding:24px 28px 28px;overflow-y:auto;flex:1}
+.cbody p{font-size:14.5px;color:var(--dim);line-height:1.72;
+  margin-bottom:18px;max-width:66ch}
+.cbody p:last-child{margin-bottom:0}
+
+/* pipeline */
+.flow{display:flex;align-items:center;flex-wrap:wrap;margin-bottom:22px;row-gap:9px}
+.st{font-size:12px;padding:6px 13px;background:var(--wash);color:#4b5563;
+  border:1px solid var(--hair)}
+.ar{color:#c3cbd4;padding:0 9px;font-size:12px}
+
+/* tables */
+.tlabel{font-size:11px;color:var(--faint);letter-spacing:.13em;
+  text-transform:uppercase;margin:24px 0 10px;font-weight:600}
+.tlabel:first-child{margin-top:0}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--faint);font-weight:600;padding:0 14px 10px 0;
+  border-bottom:1px solid var(--line)}
+th:not(:first-child),td:not(:first-child){text-align:right}
+td{padding:11px 14px 11px 0;border-bottom:1px solid var(--hair);
+  font-family:'Roboto Mono',monospace;font-size:12.5px;color:var(--dim)}
+td:first-child{font-family:'Public Sans',sans-serif;font-size:14px;color:var(--ink)}
+.hi{color:var(--sage);font-weight:500}
+.gap{color:var(--ochre)}
+
+.pull{font-family:'Fraunces',serif;font-size:16.5px;font-style:italic;
+  line-height:1.54;color:var(--ink);border-left:2px solid var(--ochre);
+  padding-left:20px;margin-top:24px}
+.aside{font-size:13.5px;color:var(--dim);background:var(--wash);
+  padding:15px 18px;margin-top:20px;line-height:1.68;border-left:2px solid var(--line)}
+
+.tags{display:flex;gap:7px;flex-wrap:wrap;margin-top:20px}
+.tg{font-size:11.5px;padding:4px 11px;background:var(--wash);
+  border:1px solid var(--hair);color:var(--dim)}
+
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));
+  gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:24px}
+.fact{background:#fff;padding:15px 17px}
+.fact b{font-family:'Fraunces',serif;font-size:25px;font-weight:500;
+  display:block;line-height:1;color:var(--slate)}
+.fact span{font-size:10.5px;color:var(--faint);letter-spacing:.08em;
+  text-transform:uppercase;display:block;margin-top:7px}
+
+ul.pts{list-style:none;margin-bottom:18px}
+ul.pts li{font-size:14px;color:var(--dim);padding-left:19px;
+  position:relative;margin-bottom:9px;line-height:1.62}
+ul.pts li::before{content:'';position:absolute;left:0;top:10px;
+  width:6px;height:1px;background:var(--ochre)}
+
+/* ─── compétences ─── */
+.skills{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:var(--line);border:1px solid var(--line)}
+.skill{background:#fff;padding:22px 24px;min-width:0}
+.skill h4{font-size:11px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ochre);margin-bottom:14px;font-weight:600}
+.skill .tags{margin-top:0}
+
+/* ─── parcours ─── */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,50px)}
+.clabel{font-size:11px;color:var(--faint);letter-spacing:.15em;
+  text-transform:uppercase;padding-bottom:12px;border-bottom:1px solid var(--line);
+  margin-bottom:24px;font-weight:600}
+.entry{position:relative;padding-left:22px;padding-bottom:26px}
+.entry::before{content:'';position:absolute;left:0;top:8px;width:7px;height:7px;
+  border:1.5px solid #c3cbd4;background:#fff;border-radius:50%}
+.entry.now::before{border-color:var(--sage);background:var(--sage)}
+.entry::after{content:'';position:absolute;left:3px;top:18px;bottom:0;
+  width:1px;background:var(--hair)}
+.entry:last-child::after{display:none}
+.when{font-family:'Roboto Mono',monospace;font-size:11.5px;
+  color:var(--faint);margin-bottom:4px}
+.what{font-size:15px;font-weight:600;line-height:1.35}
+.where{font-size:13.5px;color:var(--dim);margin-top:1px}
+.detail{font-size:13.5px;color:var(--dim);margin-top:8px;line-height:1.62}
+
+/* ─── contact ─── */
+.contact{display:grid;grid-template-columns:1.3fr 1fr;gap:clamp(28px,5vw,50px);align-items:start}
+.contact h3{font-family:'Fraunces',serif;font-size:27px;font-weight:500;
+  letter-spacing:-.018em;line-height:1.2;margin-bottom:14px}
+.contact p{color:var(--dim);font-size:15px;max-width:44ch;line-height:1.7}
+.rhythm{border-left:1px solid var(--line);padding-left:clamp(20px,3vw,32px)}
+.rhythm .k{font-size:11px;color:var(--faint);letter-spacing:.1em;
+  text-transform:uppercase;margin-bottom:5px}
+.rhythm .v{font-size:14.5px;margin-bottom:18px}
+.rhythm .v:last-child{margin-bottom:0}
+
+footer{padding:36px 0;border-top:1px solid var(--line);
+  font-size:12.5px;color:var(--faint);display:flex;
+  justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* ─── reveal ─── */
+.rv{opacity:0;transform:translateY(16px);
+  transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.3,1)}
+.rv.in{opacity:1;transform:none}
+
+@media(max-width:1000px){
+  .skills{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:860px){
+  .terms{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:640px){
+  .skills{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+  .terms{grid-template-columns:1fr}
+}
+@media(max-width:780px){
+  .hero,.two,.contact{grid-template-columns:1fr}
+  .side,.rhythm{border-left:none;border-top:1px solid var(--line);
+    padding-left:0;padding-top:26px;margin-top:8px}
+  .side{display:flex;gap:32px;flex-wrap:wrap}
+  .stat{margin-bottom:0}
+  .navlinks{gap:16px;font-size:12.5px}
+  .chead{flex-direction:column;gap:14px}
+  .turn{align-self:flex-start}
+  .two>div:last-child{margin-top:34px}
+}
+@media(prefers-reduced-motion:reduce){
+  *{transition-duration:.01ms!important;animation:none!important}
+  html{scroll-behavior:auto}
+  .rv{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a href="#top" class="brand">Mathis De Castro</a>
+  <div class="navlinks">
+    <a href="#projets">Projets</a>
+    <a href="#competences">Compétences</a>
+    <a href="#parcours">Parcours</a>
+    <a href="#contact">Contact</a>
+  </div>
+</div></nav>
+
+<header id="top"><div class="wrap">
+  <div class="hero">
+    <div>
+      <div class="avail"><span class="pulse"></span> Recherche une alternance — rentrée octobre 2026</div>
+      <h1>De la collecte brute<br>au modèle <em>qui tient</em> la route.</h1>
+      <p class="lede">Master IA &amp; Big Data à l'ESGI Paris, alternant en support informatique depuis mai 2024. Je m'intéresse à ce qui se passe entre la donnée sale et le résultat exploitable — collecte, nettoyage, traitement distribué, modélisation.</p>
+      <div class="links">
+        <a href="#" class="fill">Télécharger le CV</a>
+        <a href="#">GitHub</a>
+        <a href="#">LinkedIn</a>
+        <a href="mailto:mathis.decastro1810@gmail.com">Email</a>
+      </div>
+      <div class="terms">
+        <div class="term"><span class="k">Rythme</span><span class="v">1 semaine école · 3 semaines entreprise</span></div>
+        <div class="term"><span class="k">Début</span><span class="v">Octobre 2026</span></div>
+        <div class="term"><span class="k">Durée</span><span class="v">2 ans — Master IA &amp; Big Data</span></div>
+        <div class="term"><span class="k">Zone</span><span class="v">Île-de-France</span></div>
+      </div>
+    </div>
+    <div class="side">
+      <div class="stat"><b>899</b><span>images collectées</span></div>
+      <div class="stat"><b>6</b><span>algorithmes from scratch</span></div>
+      <div class="stat"><b>35</b><span>itérations d'optimisation</span></div>
+    </div>
+  </div>
+</div></header>
+
+<section id="projets"><div class="wrap">
+  <div class="shead"><h2>Projets</h2><i></i></div>
+
+  <div class="filters" id="filters">
+    <button class="filt on" data-f="all">Tous</button>
+    <button class="filt" data-f="cpp">C++</button>
+    <button class="filt" data-f="python">Python</button>
+    <button class="filt" data-f="spark">Spark</button>
+    <button class="filt" data-f="bdd">Bases de données</button>
+    <button class="filt" data-f="devops">DevOps</button>
+  </div>
+
+  <!-- ══ 1 ══ -->
+  <div class="flip rv" data-tags="cpp python">
+   <div class="inner">
+    <div class="face a">
+      <div class="chead">
+        <div>
+          <h3>Classification d'images de jeux vidéo</h3>
+          <div class="ctx">Projet annuel · équipe de 4 · 2026</div>
+        </div>
+        <button class="turn" data-turn>Résultats
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M2 6h8M7 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="cbody">
+        <div class="flow">
+          <span class="st">Scraping</span><span class="ar">→</span>
+          <span class="st">Nettoyage</span><span class="ar">→</span>
+          <span class="st">Vectorisation</span><span class="ar">→</span>
+          <span class="st">Six modèles C++</span><span class="ar">→</span>
+          <span class="st">Évaluation</span>
+        </div>
+        <p>899 captures de gameplay collectées par scraping et manuellement, puis vectorisées en 3072 features RGB. Six algorithmes d'apprentissage écrits from scratch en C++ — modèle linéaire, classification linéaire, SVM, perceptron multicouche, RBF et k-NN — pilotés depuis Python via une API FastAPI et un client graphique PyQt5.</p>
+        <p>Deux problèmes de classification distincts sur le même corpus : le genre du jeu (FPS, MOBA, RTS) et son mode (solo ou multijoueur). Chaque axe a ses propres hyperparamètres, optimisés séparément.</p>
+        <div class="tags">
+          <span class="tg">C++</span><span class="tg">Python</span><span class="tg">FastAPI</span>
+          <span class="tg">PyQt5</span><span class="tg">NumPy</span><span class="tg">scikit-learn</span>
+        </div>
+      </div>
+    </div>
+    <div class="face b">
+      <div class="chead">
+        <div>
+          <h3>Résultats et méthode</h3>
+          <div class="ctx">899 images · 719 train / 180 test</div>
+        </div>
+        <button class="turn" data-turn>Retour
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M2 6h8M7 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="cbody">
+        <div class="facts">
+          <div class="fact"><b>12</b><span>cas de test</span></div>
+          <div class="fact"><b>6</b><span>algorithmes</span></div>
+          <div class="fact"><b>3072</b><span>features</span></div>
+          <div class="fact"><b>35</b><span>itérations</span></div>
+        </div>
+
+        <p>Chaque algorithme a d'abord été validé sur douze jeux synthétiques à réponse connue — XOR, croix, régressions simples — avant d'approcher le dataset réel. Les erreurs d'implémentation se corrigent sur des données maîtrisées, pas noyées dans 899 images.</p>
+
+        <div class="tlabel">Genre — FPS / MOBA / RTS</div>
+        <table>
+          <tr><th>Algorithme</th><th>Train</th><th>Test</th><th>Écart</th></tr>
+          <tr><td>Classification linéaire</td><td>98,3</td><td class="hi">73,3</td><td class="gap">25,0</td></tr>
+          <tr><td>SVM</td><td>96,9</td><td>53,3</td><td class="gap">43,6</td></tr>
+          <tr><td>k-NN</td><td>100,0</td><td>56,7</td><td class="gap">43,3</td></tr>
+          <tr><td>RBF</td><td>44,5</td><td>44,4</td><td>0,1</td></tr>
+        </table>
+
+        <div class="tlabel">Mode — solo / multijoueur</div>
+        <table>
+          <tr><th>Algorithme</th><th>Train</th><th>Test</th><th>Écart</th></tr>
+          <tr><td>SVM</td><td>87,3</td><td class="hi">75,0</td><td>12,3</td></tr>
+          <tr><td>Classification linéaire</td><td>96,2</td><td>67,8</td><td class="gap">28,4</td></tr>
+          <tr><td>k-NN</td><td>100,0</td><td>65,0</td><td class="gap">35,0</td></tr>
+          <tr><td>RBF</td><td>61,8</td><td>58,9</td><td>2,9</td></tr>
+        </table>
+
+        <p class="pull">Le modèle le plus simple généralise le mieux sur le genre — vingt points d'avance sur le SVM en test, alors qu'il le talonne en entraînement.</p>
+
+        <div class="aside">Les écarts train/test signalent un surapprentissage : 899 images pour 3072 features, le rapport est défavorable. Le RBF est le cas symétrique — train et test collent à 44 %, il ne surapprend pas parce qu'il n'apprend pas assez.</div>
+
+        <ul class="pts" style="margin-top:22px">
+          <li>Résolution 32×32 retenue contre 128×128 : 49152 features auraient garanti le surapprentissage à ce volume</li>
+          <li>Partition gérée côté Python — le C++ n'a jamais accès aux données de test</li>
+          <li>Normalisation L2 pour le k-NN, sans quoi les distances sont dominées par l'échelle brute des pixels</li>
+        </ul>
+      </div>
+    </div>
+   </div>
+  </div>
+
+  <!-- ══ 2 ══ -->
+  <div class="flip rv" data-tags="python spark bdd">
+   <div class="inner">
+    <div class="face a">
+      <div class="chead">
+        <div>
+          <h3>Analyse distribuée d'un corpus musical</h3>
+          <div class="ctx">Projet Hadoop · équipe de 5 · 2026</div>
+        </div>
+        <button class="turn" data-turn>Infrastructure
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M2 6h8M7 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="cbody">
+        <div class="flow">
+          <span class="st">HDFS</span><span class="ar">→</span>
+          <span class="st">PySpark</span><span class="ar">→</span>
+          <span class="st">Nettoyage</span><span class="ar">→</span>
+          <span class="st">K-means</span><span class="ar">→</span>
+          <span class="st">Streamlit</span>
+        </div>
+        <p>Déploiement d'un cluster local complet sous WSL Ubuntu, puis pipeline de bout en bout sur un corpus de 2000 titres décrits par 18 variables audio — de l'ingestion HDFS jusqu'à la restitution web interactive.</p>
+        <div class="tags">
+          <span class="tg">PySpark</span><span class="tg">Hadoop</span><span class="tg">HDFS</span>
+          <span class="tg">YARN</span><span class="tg">Spark ML</span><span class="tg">Streamlit</span>
+        </div>
+      </div>
+    </div>
+    <div class="face b">
+      <div class="chead">
+        <div>
+          <h3>Pile et traitement</h3>
+          <div class="ctx">2000 titres · 18 variables</div>
+        </div>
+        <button class="turn" data-turn>Retour
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M2 6h8M7 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="cbody">
+        <div class="tlabel">Composants déployés</div>
+        <table>
+          <tr><th>Composant</th><th>Version</th></tr>
+          <tr><td>Java (OpenJDK)</td><td>21</td></tr>
+          <tr><td>Hadoop</td><td>3.3.6</td></tr>
+          <tr><td>Spark</td><td>3.5.1</td></tr>
+          <tr><td>PySpark</td><td>3.5.1</td></tr>
+        </table>
+        <p style="margin-top:22px">Installation complète sous WSL : variables d'environnement, mise en service de HDFS et YARN, résolution des incompatibilités entre YARN et Java 21 via les options d'ouverture de modules.</p>
+        <ul class="pts">
+          <li>Ingestion du corpus sur HDFS et vérification de l'intégrité</li>
+          <li>Parsing PySpark avec inférence de schéma — typage correct des 18 colonnes</li>
+          <li>Nettoyage : aucune valeur nulle, 59 doublons supprimés, 1941 lignes exploitables</li>
+          <li>Statistiques descriptives et détection des valeurs aberrantes</li>
+          <li>Clustering K-means via Spark ML, directement sur les données distribuées</li>
+        </ul>
+        <div class="aside">Le choix de Spark plutôt que pandas n'est pas cosmétique : pandas charge tout en mémoire sur une machine. Spark lit depuis HDFS et distribue le calcul — la même chaîne tient sur 2000 lignes comme sur 200 millions.</div>
+      </div>
+    </div>
+   </div>
+  </div>
+
+  <!-- ══ 3 ══ -->
+  <div class="flip rv" data-tags="python bdd">
+   <div class="inner">
+    <div class="face a">
+      <div class="chead">
+        <div>
+          <h3>Bases polyglotte — ventes et parrainage</h3>
+          <div class="ctx">Projet NoSQL · 2026</div>
+        </div>
+        <button class="turn" data-turn>Modélisation
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M2 6h8M7 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="cbody">
+        <div class="flow">
+          <span class="st">JSON</span><span class="ar">→</span>
+          <span class="st">MongoDB</span><span class="ar">→</span>
+          <span class="st">Neo4j</span><span class="ar">→</span>
+          <span class="st">Analyses</span>
+        </div>
+        <p>Architecture à deux moteurs conteneurisés : MongoDB pour les agrégations de ventes, Neo4j pour les analyses de réseau — co-achats et chaînes de parrainage. Le moteur est choisi selon la nature de la question posée, pas par habitude.</p>
+        <div class="tags">
+          <span class="tg">MongoDB</span><span class="tg">Neo4j</span><span class="tg">Cypher</span>
+          <span class="tg">Docker</span><span class="tg">Python</span><span class="tg">Pandas</span>
+        </div>
+      </div>
+    </div>
+    <div class="face b">
+      <div class="chead">
+        <div>
+          <h3>Deux moteurs, deux usages</h3>
+          <div class="ctx">MongoDB · Neo4j</div>
+        </div>
+        <button class="turn" data-turn>Retour
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M2 6h8M7 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="cbody">
+        <p>Infrastructure Docker Compose orchestrant les deux bases, avec scripts d'import indépendants et analyses séparées selon le type de question.</p>
+        <div class="tlabel">Répartition des rôles</div>
+        <table>
+          <tr><th>Question posée</th><th>Moteur</th></tr>
+          <tr><td>Volumes, totaux, classements</td><td>MongoDB</td></tr>
+          <tr><td>Produits achetés ensemble</td><td>Neo4j</td></tr>
+          <tr><td>Chaînes de parrainage</td><td>Neo4j</td></tr>
+        </table>
+        <ul class="pts" style="margin-top:22px">
+          <li>Import de six sources JSON vers MongoDB</li>
+          <li>Modélisation du graphe : nœuds Produit et Ticket, relations CONTAINS</li>
+          <li>Requêtes Cypher de co-achat avec déduplication des paires</li>
+          <li>Restitution des résultats en DataFrames Pandas</li>
+        </ul>
+        <div class="aside">Détecter les produits achetés ensemble revient à parcourir un graphe : deux produits reliés au même ticket. Neo4j traverse cette structure nativement, là où MongoDB devrait comparer les listes de chaque ticket deux à deux.</div>
+      </div>
+    </div>
+   </div>
+  </div>
+
+  <!-- ══ 4 ══ -->
+  <div class="flip rv" data-tags="devops python">
+   <div class="inner">
+    <div class="face a">
+      <div class="chead">
+        <div>
+          <h3>Chaîne d'intégration continue</h3>
+          <div class="ctx">Projet DevOps · équipe · 2026</div>
+        </div>
+        <button class="turn" data-turn>Workflow
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M2 6h8M7 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="cbody">
+        <div class="flow">
+          <span class="st">Commit</span><span class="ar">→</span>
+          <span class="st">Hook</span><span class="ar">→</span>
+          <span class="st">Pull request</span><span class="ar">→</span>
+          <span class="st">CI</span><span class="ar">→</span>
+          <span class="st">Revue QA</span><span class="ar">→</span>
+          <span class="st">Merge</span>
+        </div>
+        <p>Mise en place d'un workflow de développement complet sur une application de gestion de tâches : qualité de code automatisée, intégration continue et règles de protection de branche avec validation réservée au rôle QA.</p>
+        <div class="tags">
+          <span class="tg">Git</span><span class="tg">GitHub Actions</span><span class="tg">ESLint</span>
+          <span class="tg">Husky</span><span class="tg">Selenium</span>
+        </div>
+      </div>
+    </div>
+    <div class="face b">
+      <div class="chead">
+        <div>
+          <h3>Garde-fous et rôles</h3>
+          <div class="ctx">Frontend et backend</div>
+        </div>
+        <button class="turn" data-turn>Retour
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M2 6h8M7 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="cbody">
+        <ul class="pts">
+          <li>Configuration ESLint distincte sur le frontend et le backend, zéro erreur à la livraison</li>
+          <li>Hook pre-commit Husky bloquant tout commit non conforme</li>
+          <li>Pipeline GitHub Actions déclenché à chaque push et pull request</li>
+          <li>Règles de protection sur la branche principale : revue obligatoire avant merge</li>
+          <li>Attribution des rôles QA, DevOps, backend et frontend au sein de l'équipe</li>
+          <li>Rédaction des issues techniques : CI/CD, déploiement, monitoring</li>
+        </ul>
+        <div class="aside">Le merge sur la branche principale est réservé au rôle QA. Les autres membres poussent sur des branches de fonctionnalité et ouvrent des pull requests — le contrôle qualité devient structurel plutôt que déclaratif.</div>
+      </div>
+    </div>
+   </div>
+  </div>
+
+</div></section>
+
+<section id="competences"><div class="wrap">
+  <div class="shead"><h2>Compétences</h2><i></i></div>
+  <div class="skills rv">
+    <div class="skill">
+      <h4>Data engineering</h4>
+      <div class="tags">
+        <span class="tg">Hadoop</span><span class="tg">HDFS</span><span class="tg">YARN</span>
+        <span class="tg">Spark</span><span class="tg">PySpark</span><span class="tg">MapReduce</span>
+        <span class="tg">SQL</span><span class="tg">BigQuery</span><span class="tg">MongoDB</span>
+        <span class="tg">Neo4j</span><span class="tg">Docker</span>
+      </div>
+    </div>
+    <div class="skill">
+      <h4>Data science &amp; ML</h4>
+      <div class="tags">
+        <span class="tg">Pandas</span><span class="tg">NumPy</span><span class="tg">scikit-learn</span>
+        <span class="tg">TensorFlow</span><span class="tg">Keras</span><span class="tg">Spark ML</span>
+        <span class="tg">Streamlit</span>
+      </div>
+    </div>
+    <div class="skill">
+      <h4>Développement</h4>
+      <div class="tags">
+        <span class="tg">Python</span><span class="tg">C</span><span class="tg">C++</span>
+        <span class="tg">Java</span><span class="tg">Bash</span><span class="tg">SQL</span>
+        <span class="tg">PHP</span><span class="tg">HTML/CSS</span><span class="tg">FastAPI</span>
+      </div>
+    </div>
+    <div class="skill">
+      <h4>Outils &amp; méthodes</h4>
+      <div class="tags">
+        <span class="tg">Git</span><span class="tg">GitHub Actions</span><span class="tg">Linux</span>
+        <span class="tg">WSL</span><span class="tg">ESLint</span><span class="tg">Selenium</span>
+        <span class="tg">Scrum</span>
+      </div>
+    </div>
+    <div class="skill">
+      <h4>Soft skills</h4>
+      <div class="tags">
+        <span class="tg">Curiosité intellectuelle</span><span class="tg">Analyse et synthèse</span>
+        <span class="tg">Résolution de problèmes</span><span class="tg">Travail en équipe</span>
+        <span class="tg">Communication claire</span><span class="tg">Rigueur</span>
+      </div>
+    </div>
+    <div class="skill">
+      <h4>Langues</h4>
+      <div class="tags">
+        <span class="tg">Français — natif</span><span class="tg">Portugais — courant</span>
+        <span class="tg">Anglais — B1</span><span class="tg">Espagnol — A2</span>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section id="parcours"><div class="wrap">
+  <div class="shead"><h2>Parcours</h2><i></i></div>
+  <div class="two rv">
+    <div>
+      <div class="clabel">Formation</div>
+      <div class="entry now">
+        <div class="when">2026 — 2028</div>
+        <div class="what">Master Informatique — IA &amp; Big Data</div>
+        <div class="where">ESGI, Paris 12</div>
+      </div>
+      <div class="entry">
+        <div class="when">2023 — 2026</div>
+        <div class="what">Bachelor Informatique</div>
+        <div class="where">ESGI, Paris 12</div>
+      </div>
+      <div class="entry">
+        <div class="when">2022 — 2023</div>
+        <div class="what">Classe préparatoire PCSI</div>
+        <div class="where">Lycée Schweitzer, Le Raincy</div>
+      </div>
+      <div class="entry">
+        <div class="when">2022</div>
+        <div class="what">Baccalauréat général</div>
+        <div class="where">Mathématiques et physique-chimie — mention assez bien</div>
+      </div>
+    </div>
+    <div>
+      <div class="clabel">Expérience</div>
+      <div class="entry now">
+        <div class="when">Depuis mai 2024</div>
+        <div class="what">Alternance — support informatique</div>
+        <div class="where">UTH, groupe hôtelier</div>
+        <div class="detail">Support de premier niveau auprès des établissements du groupe, plus de vingt tickets par jour, diagnostic et résolution d'incidents en environnement multi-sites.</div>
+      </div>
+      <div class="entry">
+        <div class="when">Mars — avril 2024</div>
+        <div class="what">Stage informatique</div>
+        <div class="where">TD Synnex</div>
+        <div class="detail">Gestion d'un parc utilisateurs, maintenance des outils en centre logistique, administration réseau de niveau 1.</div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section id="contact"><div class="wrap">
+  <div class="shead"><h2>Contact</h2><i></i></div>
+  <div class="contact rv">
+    <div>
+      <h3>Je cherche une alternance autour de la data.</h3>
+      <p>Data engineering, data analyse, ou tout poste où il s'agit de collecter, structurer et exploiter des données. Rentrée d'octobre 2026, sur toute l'Île-de-France.</p>
+      <div class="links">
+        <a href="mailto:mathis.decastro1810@gmail.com" class="fill">mathis.decastro1810@gmail.com</a>
+        <a href="#">LinkedIn</a>
+        <a href="#">GitHub</a>
+      </div>
+    </div>
+    <div class="rhythm">
+      <div class="k">Rythme</div>
+      <div class="v">1 semaine école · 3 semaines entreprise</div>
+      <div class="k">Début</div>
+      <div class="v">Octobre 2026</div>
+      <div class="k">Formation</div>
+      <div class="v">Master IA &amp; Big Data — ESGI Paris</div>
+    </div>
+  </div>
+</div></section>
+
+<footer><div class="wrap" style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-left:0;padding-right:0">
+  <span>Mathis De Castro</span><span>2026</span>
+</div></footer>
+
+<script>
+(function(){
+  'use strict';
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var cards = [].slice.call(document.querySelectorAll('.flip'));
+
+  /* Mesure fiable : on clone la face dans un conteneur hors écran
+     de meme largeur. Une face masquee en rotateY ne se mesure pas
+     correctement, d'ou le residu de hauteur au retour. */
+  var ghost = document.createElement('div');
+  ghost.setAttribute('aria-hidden','true');
+  ghost.style.cssText = 'position:absolute;left:-99999px;top:0;visibility:hidden;pointer-events:none';
+  document.body.appendChild(ghost);
+
+  function measure(card, back){
+    var src = card.querySelector(back ? '.face.b' : '.face.a');
+    var w = card.clientWidth || card.offsetWidth;
+    if(!w) return 0;
+    ghost.style.width = w + 'px';
+    var clone = src.cloneNode(true);
+    clone.style.cssText = 'position:static;inset:auto;transform:none;' +
+      'backface-visibility:visible;-webkit-backface-visibility:visible;' +
+      'display:flex;flex-direction:column;width:100%;height:auto';
+    var body = clone.querySelector('.cbody');
+    if(body){ body.style.overflow = 'visible'; body.style.flex = 'none'; body.style.height = 'auto'; }
+    ghost.innerHTML = '';
+    ghost.appendChild(clone);
+    var h = clone.offsetHeight;
+    ghost.innerHTML = '';
+    return h;
+  }
+
+  function apply(card){
+    if(card.classList.contains('gone')) return;
+    var front = measure(card, false);
+    var back  = measure(card, true);
+    if(!front && !back) return;
+    var open  = card.classList.contains('on');
+    var h;
+    if(!open){
+      h = front + 18;
+    }else{
+      h = Math.max(back, front);
+      var cap = Math.max(front * 2.7, 640);
+      if(h > cap) h = cap;
+      h += 18;
+    }
+    card.style.height = Math.round(h) + 'px';
+  }
+
+  function applyAll(){ cards.forEach(apply); }
+
+  cards.forEach(function(card){
+    card.querySelectorAll('[data-turn]').forEach(function(b){
+      b.addEventListener('click', function(){
+        card.classList.toggle('on');
+        apply(card);
+        card.querySelectorAll('.cbody').forEach(function(x){ x.scrollTop = 0; });
+      });
+    });
+  });
+
+  applyAll();
+  window.addEventListener('load', applyAll);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(applyAll);
+
+  var t;
+  addEventListener('resize', function(){ clearTimeout(t); t = setTimeout(applyAll, 150); });
+
+  /* filtres */
+  document.getElementById('filters').addEventListener('click', function(e){
+    var b = e.target.closest('.filt');
+    if(!b) return;
+    var f = b.dataset.f;
+    this.querySelectorAll('.filt').forEach(function(x){ x.classList.toggle('on', x === b); });
+    cards.forEach(function(c){
+      var show = f === 'all' || (c.dataset.tags || '').split(' ').indexOf(f) !== -1;
+      c.classList.toggle('gone', !show);
+      if(show && c.classList.contains('on')) c.classList.remove('on');
+    });
+    requestAnimationFrame(applyAll);
+  });
+
+  /* apparition */
+  if(!reduce && 'IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    }, {threshold:.06, rootMargin:'0px 0px -50px 0px'});
+    document.querySelectorAll('.rv').forEach(function(el){ io.observe(el); });
+  } else {
+    document.querySelectorAll('.rv').forEach(function(el){ el.classList.add('in'); });
+  }
+
+  /* nav active */
+  var links = [].slice.call(document.querySelectorAll('.navlinks a'));
+  var secs = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  function mark(){
+    var y = scrollY + 130, cur = -1;
+    secs.forEach(function(s,i){ if(s && s.offsetTop <= y) cur = i; });
+    links.forEach(function(a,i){ a.classList.toggle('on', i === cur); });
+  }
+  addEventListener('scroll', mark, {passive:true});
+  mark();
+})();
+</script>
+</body>
+</html>
